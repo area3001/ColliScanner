@@ -9,19 +9,19 @@ except ImportError:
 class ColruytAPI:
 	def __init__(self):
 		self.h = http.Http()
-		self.token =''
-		self.uri = 'https://cogomw.colruyt.be'
-		self.basePath = '/cogomw/rest/nl/4'
-		self.method = 'POST'
+		self.token = ""
+		self.uri = "https://cogomw.colruyt.be"
+		self.basePath = "/cogomw/rest/nl/4"
+		self.method = "POST"
 		self.headers = {
-			'Host': 'cogomw.colruyt.be',
-			'Proxy-Connection': 'keep-alive',
-			'Accept-Encoding': 'gzip, deflate',
-			'Content-Type': 'application/x-www-form-urlencoded',
-			'Accept-Language': 'nl-nl',
-			'Accept': '*/*',
-			'Connection': 'keep-alive',
-			'User-Agent': 'Collect&Go/3.3.1.11218 CFNetwork/758.1.3 Darwin/15.0.0'
+			"Host": "cogomw.colruyt.be",
+			"Proxy-Connection": "keep-alive",
+			"Accept-Encoding": "gzip, deflate",
+			"Content-Type": "application/x-www-form-urlencoded",
+			"Accept-Language": "nl-nl",
+			"Accept": "*/*",
+			"Connection": "keep-alive",
+			"User-Agent": "Collect&Go/3.3.1.11218 CFNetwork/758.1.3 Darwin/15.0.0"
 		}
 
 	def request(self, path, body):
@@ -38,55 +38,55 @@ class ColruytAPI:
 		return json.loads(content)
 
 	def responseIsSuccess(self, response):
-		if response['status']['code'] == 0:
+		if response["status"]["code"] == 0:
 			return True
 		return False
 
 	def login(self, username, password):
-		path = '/users/authenticate.json'
-		body = 'logon_id=%s&password=%s' % (username, password)
+		path = "/users/authenticate.json"
+		body = "logon_id=%s&password=%s" % (username, password)
 		response = self.request(path, body)
 
 		if self.responseIsSuccess(response):
-			self.token = response['data']['oAuth']
+			self.token = response["data"]["oAuth"]
 			return
-		raise ValueError('Login failed')
+		raise ValueError("Login failed")
 
 	def logout(self):
-		path = '/log_off.json'
-		body = 'oAuth=%s' % (self.token)
+		path = "/log_off.json"
+		body = "oAuth=%s" % (self.token)
 		response = self.request(path, body)
 		if not self.responseIsSuccess(response):
-			raise ValueError('Logout failed')
+			raise ValueError("Logout failed")
 
 	def search(self, barcode):
-		path = '/articles/search.json'
-		body = 'oAuth=%s&barcode=%s' % (self.token, barcode)
+		path = "/articles/search.json"
+		body = "oAuth=%s&barcode=%s" % (self.token, barcode)
 		response = self.request(path, body)
 		if self.responseIsSuccess(response):
 			return response
-		raise ValueError('search of barcode %S failed' % (barcode))
+		raise ValueError("search of barcode %S failed" % (barcode))
 
-	def add(self, id, quantity, weigtCode='G'):
-		path = '/basket/articles/add.json'
-		body = 'id=%s&weightCode=%s&comment=&quantity=%s&oAuth=%s' % (id, weigtCode, quantity, self.token)
+	def add(self, id, quantity, weigtCode="G"):
+		path = "/basket/articles/add.json"
+		body = "id=%s&weightCode=%s&comment=&quantity=%s&oAuth=%s" % (id, weigtCode, quantity, self.token)
 		return self.request(path, body)
 
 	def get_product_image(self, path):
-		uri = 'https://colruyt.collectandgo.be/cogo'
+		uri = "https://colruyt.collectandgo.be/cogo"
 		headers = {
-			'Host': 'colruyt.collectandgo.be',
-			'Proxy-Connection': 'keep-alive',
-			'Accept-Encoding': 'gzip, deflate',
-			'Accept-Language': 'nl-nl',
-			'Accept': '*/*',
-			'Connection': 'keep-alive',
-			'User-Agent': 'Collect&Go/3.3.1.11218 CFNetwork/758.1.3 Darwin/15.0.0'
+			"Host": "colruyt.collectandgo.be",
+			"Proxy-Connection": "keep-alive",
+			"Accept-Encoding": "gzip, deflate",
+			"Accept-Language": "nl-nl",
+			"Accept": "*/*",
+			"Connection": "keep-alive",
+			"User-Agent": "Collect&Go/3.3.1.11218 CFNetwork/758.1.3 Darwin/15.0.0"
 		}
 		target = urlparse(uri+path)
 		response, content = self.h.request(
 				target.geturl(),
-				'GET',
+				"GET",
 				headers=headers)
 		if response.status == 200:
 			return content

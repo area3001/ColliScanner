@@ -17,26 +17,26 @@ while True:
 	try:
 		image = scanner.scan()
 		for symbol in image:
-			print 'decoded', symbol.type, 'symbol', '"%s"' % symbol.data
+			print "decoded %s symbol, %s" % (symbol.type, symbol.data)
 			try:
 				response = api.search(symbol.data)
 
-				print "zoeken van product met barcode %s: %s" % (symbol.data, response['status']['meaning'])
+				print "zoeken van product met barcode %s: %s" % (symbol.data, response["status"]["meaning"])
 
-				productId = response['data']['searchResults'][0]['list'][0]['id']
-				productBrand = response['data']['searchResults'][0]['list'][0]['brand']
-				productDescription = response['data']['searchResults'][0]['list'][0]['description']
-				productImagePath = response['data']['searchResults'][0]['list'][0]['overviewImage']
+				productId = response["data"]["searchResults"][0]["list"][0]["id"]
+				productBrand = response["data"]["searchResults"][0]["list"][0]["brand"]
+				productDescription = response["data"]["searchResults"][0]["list"][0]["description"]
+				productImagePath = response["data"]["searchResults"][0]["list"][0]["overviewImage"]
 				
 				image = api.get_product_image(productImagePath)
-				print 'Product [%s] %s - %s' % (productId, productBrand, productDescription)
+				print "Product [%s] %s - %s" % (productId, productBrand, productDescription)
 
-				response = api.add(productId, 1, 'S')
-				print "toevoegen aan de winkelmand: %s" % (response['status']['meaning'])
+				response = api.add(productId, 1, "S")
+				print "toevoegen aan de winkelmand: %s" % (response["status"]["meaning"])
 
 				time.sleep(3)
 			except ValueError:
-				print 'something went wrong'
+				print "something went wrong"
 	except (KeyboardInterrupt, SystemExit):
 		print "catched keyboardinterrupt"
 		break
