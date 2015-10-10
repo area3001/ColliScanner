@@ -28,10 +28,8 @@ while True:
 				productDescription = response['data']['searchResults'][0]['list'][0]['description']
 				productImagePath = response['data']['searchResults'][0]['list'][0]['overviewImage']
 				
-				#image = api.get_product_image(productImagePath)
-
+				image = api.get_product_image(productImagePath)
 				print 'Product [%s] %s - %s' % (productId, productBrand, productDescription)
-
 
 				response = api.add(productId, 1, 'S')
 				print "toevoegen aan de winkelmand: %s" % (response['status']['meaning'])
@@ -39,7 +37,6 @@ while True:
 				time.sleep(3)
 			except ValueError:
 				print 'something went wrong'
-				break
 	except (KeyboardInterrupt, SystemExit):
 		print "catched keyboardinterrupt"
 		break
