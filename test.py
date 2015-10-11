@@ -47,14 +47,17 @@ while True:
 			response = api.add(productId, 1, "S")
 			print "toevoegen aan de winkelmand: %s" % (response["status"]["meaning"])
 
-			time.sleep(3)
+			time.sleep(5)
 
 			basket = api.show_basket()
 
+			basket_content =""
 			for category in basket["data"]["articles"]:
-				print category["colruyt.cogomw.bo.RestTreeBranch"]["description"]
+				basket += category["colruyt.cogomw.bo.RestTreeBranch"]["description"] + "\n"
 				for article in category["list"]:
-					print "%s - %s : %s" % (article["brand"], article["description"], article["quantity"])
+					basket += "  %s - %s : %s stuks\n" % (article["brand"], article["description"], article["quantity"])
+			display.show_message(basket_content)
+			time.sleep(5)
 		except ValueError as e:
 			print "something went wrong: %s" % (e)
 		except:
