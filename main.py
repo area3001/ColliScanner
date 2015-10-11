@@ -1,6 +1,7 @@
 import sys
 import time
 import barcode
+import display
 import colruyt
 
 if len(sys.argv) != 3:
@@ -11,6 +12,7 @@ password = sys.argv[2]
 
 api = colruyt.ColruytAPI(username, password)
 scanner = barcode.BarcodeScanner(800, 600)
+display = display.Display()
 
 while True:
 	try:
@@ -28,6 +30,8 @@ while True:
 				productImagePath = response["data"]["searchResults"][0]["list"][0]["overviewImage"]
 				
 				image = api.get_product_image(productImagePath)
+				if image is not None:
+					display.show_image(image)
 				print "Product [%s] %s - %s" % (productId, productBrand, productDescription)
 
 				response = api.add(productId, 1, "S")
@@ -40,6 +44,7 @@ while True:
 		print "catched keyboardinterrupt"
 		break
 
+display.close()
 scanner.stop()
 api.logout()
 del(scanner)
