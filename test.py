@@ -56,8 +56,14 @@ while True:
 				basket_content += category["colruyt.cogomw.bo.RestTreeBranch"]["description"] + "\n"
 				for article in category["list"]:
 					basket_content += "  %s - %s : %s stuks\n" % (article["brand"], article["description"], article["quantity"])
+			basket_content += "----------------------\n"
+			basket_content += "subtotal: €%s\n" % basket["data"]["subTotal"]
+			basket_content += "service cost: €%s\n" % basket["data"]["serviceCost"]
+			basket_content += "total: €%s\n" % basket["data"]["total"]
+			basket_content += "-----------------------\n"
 			display.show_message(basket_content)
 			print basket_content
+
 			time.sleep(5)
 		except ValueError as e:
 			print "something went wrong: %s" % (e)
