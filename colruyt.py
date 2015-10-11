@@ -68,7 +68,7 @@ class ColruytAPI:
 		response = self.request(path, body)
 		if self.responseIsSuccess(response):
 			return response
-		raise ValueError("search of barcode %S failed" % (barcode))
+		raise ValueError("search of barcode %s failed" % (barcode))
 
 	def add(self, id, quantity, weigtCode="G"):
 		path = "/basket/articles/add.json"
