@@ -5,6 +5,7 @@ from PIL import Image
 class Display:
 	def __init__(self):
 		self.open()
+		self.ip = "0.0.0.0"
 
 	def show_product(self, image, brand, description):
 		img = Image.open(io.BytesIO(image))
@@ -15,7 +16,14 @@ class Display:
 		font = pygame.font.Font(None, 36)
 		text = font.render("%s - %s" % (brand, description), 1, (255, 255, 255))
 		textpos = text.get_rect(midtop=(self.screen.get_width()/2, (self.screen.get_height()/2 + gameimg.get_height()/2 + 10)))
-		textpos.centerx = self.screen.get_rect().centerx
+		self.screen.blit(text, textpos)
+
+		pygame.display.flip()
+
+	def show_message(self, message):
+		font = pygame.font.Font(None, 36)
+		text = font.render(message, 1, (255, 255, 255))
+		textpos = text.get_rect(centerx=self.screen.get_width()/2, centery=self.screen.get_height()/2)
 		self.screen.blit(text, textpos)
 
 		pygame.display.flip()

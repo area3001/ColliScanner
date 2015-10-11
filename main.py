@@ -3,6 +3,18 @@ import time
 import barcode
 import display
 import colruyt
+import socket
+import fcntl
+import struct
+
+def get_ip_address(ifname):
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	return socket.inet_ntoa(fcntl.ioctl(
+		s.fileno(),
+		0x8915,  # SIOCGIFADDR
+		struct.pack('256s', ifname[:15])
+	)[20:24])
+
 
 if len(sys.argv) != 3:
 	exit(0)
@@ -14,8 +26,11 @@ api = colruyt.ColruytAPI(username, password)
 scanner = barcode.BarcodeScanner(800, 600)
 display = display.Display()
 
+ip = get_ip_address("eth0")
+
 while True:
 	try:
+		display.show_message("your ip is %s" % (ip))
 		# scan for a barcode
 		image = scanner.scan()
 		for symbol in image:
@@ -45,7 +60,6 @@ while True:
 
 				# wait some time
 				time.sleep(3)
-
 			except ValueError as e:
 				print "something went wrong: %s" % (e)
 	except (KeyboardInterrupt, SystemExit):
