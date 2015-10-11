@@ -75,6 +75,11 @@ class ColruytAPI:
 		body = "id=%s&weightCode=%s&comment=&quantity=%s&oAuth=%s" % (id, weigtCode, quantity, self.token)
 		return self.request(path, body)
 
+	def show_basket(self):
+		path = "/basket/show.json"
+		body = "oAuth=%s" % (self.token)
+		return self.request(path, body)
+
 	def get_product_image(self, path):
 		path = path.replace("200x200", "500x500")
 		uri = "https://colruyt.collectandgo.be/cogo"

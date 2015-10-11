@@ -48,6 +48,8 @@ while True:
 			print "toevoegen aan de winkelmand: %s" % (response["status"]["meaning"])
 
 			time.sleep(3)
+
+			print api.show_basket()
 		except ValueError as e:
 			print "something went wrong: %s" % (e)
 		except:
