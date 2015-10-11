@@ -16,30 +16,38 @@ display = display.Display()
 
 while True:
 	try:
+		# scan for a barcode
 		image = scanner.scan()
 		for symbol in image:
+			# barcodes found
 			print "decoded %s symbol, %s" % (symbol.type, symbol.data)
 			try:
+				# look up the product using its barcode
 				response = api.search(symbol.data)
 
-				print "zoeken van product met barcode %s: %s" % (symbol.data, response["status"]["meaning"])
+				print "Looking up product with %s barcode %s: %s" % (symbol.type, symbol.data, response["status"]["meaning"])
 
 				productId = response["data"]["searchResults"][0]["list"][0]["id"]
 				productBrand = response["data"]["searchResults"][0]["list"][0]["brand"]
 				productDescription = response["data"]["searchResults"][0]["list"][0]["description"]
 				productImagePath = response["data"]["searchResults"][0]["list"][0]["overviewImage"]
 				
-				image = api.get_product_image(productImagePath)
-				if image is not None:
-					display.show_image(image)
 				print "Product [%s] %s - %s" % (productId, productBrand, productDescription)
 
+				# get product image and show on the screen
+				image = api.get_product_image(productImagePath)
+				if image is not None:
+					display.show_product(image, productBrand, productDescription)
+				
+				# add product to cart
 				response = api.add(productId, 1, "S")
-				print "toevoegen aan de winkelmand: %s" % (response["status"]["meaning"])
+				print "Adding product to shopping cart: %s" % (response["status"]["meaning"])
 
+				# wait some time
 				time.sleep(3)
-			except ValueError:
-				print "something went wrong"
+
+			except ValueError as e:
+				print "something went wrong: %s" % (e)
 	except (KeyboardInterrupt, SystemExit):
 		print "catched keyboardinterrupt"
 		break
