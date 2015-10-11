@@ -57,9 +57,9 @@ while True:
 				for article in category["list"]:
 					basket_content += "  %s - %s : %s stuks\n" % (article["brand"], article["description"], article["quantity"])
 			basket_content += u"----------------------\n"
-			basket_content += u"subtotal: €%s\n" % (basket["data"]["subTotal"])
-			basket_content += u"service cost: €%s\n" % (basket["data"]["serviceCost"])
-			basket_content += u"total: €%s\n" % (basket["data"]["total"])
+			basket_content += u"subtotal: %s euro\n" % (basket["data"]["subTotal"])
+			basket_content += u"service cost: %s euro\n" % (basket["data"]["serviceCost"])
+			basket_content += u"total: %s euro\n" % (basket["data"]["total"])
 			basket_content += u"-----------------------\n"
 			display.show_message(basket_content)
 			print basket_content
