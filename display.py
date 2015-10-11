@@ -7,6 +7,7 @@ class Display:
 		self.open()
 
 	def show_product(self, image, brand, description):
+		self.clear()
 		img = Image.open(io.BytesIO(image))
 		gameimg = pygame.image.fromstring(img.tobytes(), img.size, "RGB")
 		gameimgpos = gameimg.get_rect(centerx=self.screen.get_width()/2, centery=self.screen.get_height()/2)
@@ -20,6 +21,7 @@ class Display:
 		pygame.display.flip()
 
 	def show_message(self, message):
+		self.clear()
 		font = pygame.font.Font(None, 36)
 		text = font.render(message, 1, (255, 255, 255))
 		textpos = text.get_rect(centerx=self.screen.get_width()/2, centery=self.screen.get_height()/2)
@@ -33,6 +35,9 @@ class Display:
 		pygame.mouse.set_visible(False)
 		self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 		self.size = self.screen.get_size()
+
+	def clear(self):
+		self.screen.fill((0,0,0))
 
 	def close(self):
 		pygame.display.quit()
