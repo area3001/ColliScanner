@@ -51,12 +51,13 @@ while True:
 
 			basket = api.show_basket()
 
-			basket_content =""
+			basket_content = ""
 			for category in basket["data"]["articles"]:
-				basket += category["colruyt.cogomw.bo.RestTreeBranch"]["description"] + "\n"
+				basket_content += category["colruyt.cogomw.bo.RestTreeBranch"]["description"] + "\n"
 				for article in category["list"]:
-					basket += "  %s - %s : %s stuks\n" % (article["brand"], article["description"], article["quantity"])
+					basket_content += "  %s - %s : %s stuks\n" % (article["brand"], article["description"], article["quantity"])
 			display.show_message(basket_content)
+			print basket_content
 			time.sleep(5)
 		except ValueError as e:
 			print "something went wrong: %s" % (e)
