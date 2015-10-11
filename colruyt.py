@@ -7,7 +7,7 @@ except ImportError:
 	from urllib.parse import urlparse
 
 class ColruytAPI:
-	def __init__(self):
+	def __init__(self, username = None, password = None):
 		self.h = http.Http()
 		self.token = ""
 		self.uri = "https://cogomw.colruyt.be"
@@ -23,6 +23,9 @@ class ColruytAPI:
 			"Connection": "keep-alive",
 			"User-Agent": "Collect&Go/3.3.1.11218 CFNetwork/758.1.3 Darwin/15.0.0"
 		}
+		if username is not None and password is not None:
+			self.login(username, password)
+
 
 	def request(self, path, body):
 		target = urlparse(self.uri+self.basePath+path)
@@ -50,7 +53,7 @@ class ColruytAPI:
 		if self.responseIsSuccess(response):
 			self.token = response["data"]["oAuth"]
 			return
-		raise ValueError("Login failed")
+		raise ValueError("Login failed: %s" % (response["status"]["meaning"]))
 
 	def logout(self):
 		path = "/log_off.json"
@@ -73,6 +76,7 @@ class ColruytAPI:
 		return self.request(path, body)
 
 	def get_product_image(self, path):
+		path = path.replace("200x200", "500x500")
 		uri = "https://colruyt.collectandgo.be/cogo"
 		headers = {
 			"Host": "colruyt.collectandgo.be",

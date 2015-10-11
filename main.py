@@ -9,9 +9,8 @@ if len(sys.argv) != 3:
 username = sys.argv[1]
 password = sys.argv[2]
 
-api = colruyt.ColruytAPI()
-scanner = barcode.BarcodeScanner()
-api.login(username, password)
+api = colruyt.ColruytAPI(username, password)
+scanner = barcode.BarcodeScanner(800, 600)
 
 while True:
 	try:
@@ -43,7 +42,6 @@ while True:
 
 scanner.stop()
 api.logout()
-
 del(scanner)
 del(api)
 
