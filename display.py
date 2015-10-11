@@ -6,7 +6,7 @@ class Display:
 	def __init__(self):
 		self.open()
 
-	def show_product(self, image, brand, description):
+	def show_product(self, image, brand, description, price):
 		self.clear()
 		img = Image.open(io.BytesIO(image))
 		gameimg = pygame.image.fromstring(img.tobytes(), img.size, "RGB")
@@ -14,7 +14,7 @@ class Display:
 		self.screen.blit(gameimg, gameimgpos)
 
 		font = pygame.font.Font(None, 36)
-		text = font.render("%s - %s" % (brand, description), 1, (255, 255, 255))
+		text = font.render("%s - %s : %s euro" % (brand, description, price), 1, (255, 255, 255))
 		textpos = text.get_rect(midtop=(self.screen.get_width()/2, (self.screen.get_height()/2 + gameimg.get_height()/2 + 10)))
 		self.screen.blit(text, textpos)
 

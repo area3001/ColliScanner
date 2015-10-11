@@ -37,12 +37,13 @@ while True:
 			productBrand = response["data"]["searchResults"][0]["list"][0]["brand"]
 			productDescription = response["data"]["searchResults"][0]["list"][0]["description"]
 			productImagePath = response["data"]["searchResults"][0]["list"][0]["overviewImage"]
+			price = response["data"]["searchResults"][0]["list"][0]["price"]
 
 			image = api.get_product_image(productImagePath)
 			if image is not None:
-				display.show_product(image, productBrand, productDescription)
+				display.show_product(image, productBrand, productDescription, price)
 
-			print "Product [%s] %s - %s" % (productId, productBrand, productDescription)
+			print "Product [%s] %s - %s : %s euro" % (productId, productBrand, productDescription, price)
 
 			response = api.add(productId, 1, "S")
 			print "toevoegen aan de winkelmand: %s" % (response["status"]["meaning"])
