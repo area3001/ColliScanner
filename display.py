@@ -5,7 +5,6 @@ from PIL import Image
 class Display:
 	def __init__(self):
 		self.open()
-		self.ip = "0.0.0.0"
 
 	def show_product(self, image, brand, description):
 		img = Image.open(io.BytesIO(image))
