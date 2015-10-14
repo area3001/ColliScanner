@@ -46,13 +46,14 @@ while True:
 				productBrand = response["data"]["searchResults"][0]["list"][0]["brand"]
 				productDescription = response["data"]["searchResults"][0]["list"][0]["description"]
 				productImagePath = response["data"]["searchResults"][0]["list"][0]["overviewImage"]
-				
-				print "Product [%s] %s - %s" % (productId, productBrand, productDescription)
+				price = response["data"]["searchResults"][0]["list"][0]["price"]
+
+				print "Product [%s] %s - %s : %s euro" % (productId, productBrand, productDescription, price)
 
 				# get product image and show on the screen
 				image = api.get_product_image(productImagePath)
 				if image is not None:
-					display.show_product(image, productBrand, productDescription)
+					display.show_product(image, productBrand, productDescription, price)
 				
 				# add product to cart
 				response = api.add(productId, 1, "S")
