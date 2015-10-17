@@ -14,7 +14,7 @@ class BarcodeScanner(Thread):
 		self.camera.resolution = (resolutionX, resolutionY)
 		Thread.__init__(self)
 
-	def setCallback(self, callback)
+	def setCallback(self, callback):
 		self.callback = callback
 
     def run(self):
