@@ -7,7 +7,7 @@ from kivy.properties import BoundedNumericProperty
 from kivy.clock import Clock
 from kivy.factory import Factory
 from colruyt import ColruytAPI
-#from barcode import BarcodeScanner
+from barcode import BarcodeScanner
 import socket
 import fcntl
 import struct
@@ -17,6 +17,12 @@ class RootScreen(ScreenManager):
     api = None
     app = None
     scanned = None
+    scanner = None
+
+    def build(self):
+        self.scanner = BarcodeScanner(800, 600)
+        return self
+
     def go_next(self, screenName):
         self.transition.direction = "left"
         self.current = screenName
@@ -54,7 +60,7 @@ class LoginView(Screen):
 class ProductView(Screen):
     id = None
     amount = BoundedNumericProperty(1, min=1, max=100, errorvalue=1)
-    progress = BoundedNumericProperty(1, min=0, max=100, errorvalue=1)
+    progress = BoundedNumericProperty(0, min=0, max=100, errorvalue=1)
 
     def on_leave(self):
         self.stop_timer()
@@ -86,8 +92,7 @@ class ProductView(Screen):
 
         print "Product [%s] %s - %s : %s euro" % (productId, productBrand, productDescription, price)
 
-        #Clock.schedule_once(self.timeout_callback, 10)
-        self.progress = 1
+        self.progress = 0
         Clock.schedule_interval(self.progress_callback, float(App.get_running_app().config.getdefaultint("ColliScanner", "wait_time", 10))/100)
 
     def progress_callback(self, dt):
@@ -114,9 +119,6 @@ class ProductView(Screen):
     def confirm(self):
         self.add_product()
 
-    def timeout_callback(self, dt):
-        self.add_product()
-
     def add_product(self):
         response = self.manager.api.add(self.id, self.amount, "S")
         print "%s stuks toevoegen aan de winkelmand: %s" % (self.amount, response["status"]["meaning"])
@@ -140,25 +142,22 @@ class ScannerView(Screen):
         self.manager.go_back("LoginView")
 
     def scan_callback(self, dt):
-        #image = App.get_running_app().scanner.scan()
-        image = "5449000011527"
-        if image is not None:
-            self.manager.scanned = image
+        image = self.manager.scanner.scan()
+        for symbol in image:
+            # barcodes found
+            print "decoded %s symbol, %s" % (symbol.type, symbol.data)
+            self.manager.scanned = symbol.data
             self.manager.go_next("ProductView")
             return False # stop the clock callback
         return True # continue the clock callback
 
     def setCallback(self):
         pass
-        #Clock.schedule_interval(self.scan_callback, 3) # scan every 2 seconds
-        #self.ids.product_description.text = "Your IP is %s" % (self.get_ip_address("en0"))
+        Clock.schedule_interval(self.scan_callback, 1/30.) # scan every 2 seconds
 
 class IpView(Screen):
-    ip = "192.xxx.xxx.xxx"
-
     def on_pre_enter(self):
-        #self.ip = self.get_ip_address("en0")
-        self.ip = "test"
+        self.ids.lblip.text = "Your IP is %s" % (self.get_ip_address("eth0"))
 
     def get_ip_address(self, ifname):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -192,7 +191,7 @@ class BasketView(Screen):
         self.ids.articles.add_widget(article_inst)
 
 class ColliScanApp(App):
-    #scanner = None 
+    scanner = None 
     manager = None
 
     def build_config(self, config):
@@ -212,8 +211,7 @@ class ColliScanApp(App):
         password = config.get("credentials", "password")
 
         self.manager = RootScreen()
-        self.manager.app = self
-        #self.scanner = BarcodeScanner(800, 600)
+        self.manager.app = self 
 
         if username and password:
             self.manager.api = ColruytAPI(username, password)
