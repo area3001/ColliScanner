@@ -46,7 +46,7 @@
 
 		Label:
 			id: product_description
-			text: "Product desciption"
+			text: "<none>"
 			size_hint: 1, 0.1
 			halign: "center"
 
@@ -95,8 +95,21 @@
 
 		Label:
 			text: "Scan your product"
-			size_hint: 1, 0.9
+			size_hint: 1, 0.75
 			halign: "center"
+
+		Label:
+			text: "Or search manually:"
+			size_hint: 1, 0.05
+			halign: "center"
+		TextInput:
+			id: txtBarcode
+			size_hint: 1, 0.05
+			multiline: False
+		Button:
+			text: "Search"
+			size_hint: 1, 0.05
+			on_press: root.search()
 
 		BoxLayout:
 			size_hint: 1, 0.1
@@ -156,21 +169,129 @@
 		size: root.size
 		orientation: "vertical"
 		padding: 20
-		spacing: 10
+		#spacing: 10
 
-		Label:
-			id: lblIp
-			text: "Basket"
-			size_hint: 1, 0.9
-			halign: "center"
+		BoxLayout:
+			size_hint: 1, 0.05
+			orientation: "horizontal"
+
+			Label:
+				text: "image"
+				size_hint: 0.2, 1
+
+			Label: 
+				size_hint: 0.3, 1
+				text: "Brand"
+
+			Label:
+				size_hint: 0.4, 1
+				text: "Desciption"
+
+			Label:
+				size_hint: 0.05, 1
+				text: "qty"
+
+			Label:
+				size_hint: 0.05, 1
+				text: "tot"
+
+		ScrollView:
+			effect_cls: "DampedScrollEffect"
+			do_scroll_x: False
+			size_hint: 1, 0.7
+			BoxLayout:
+				id: articles
+				orientation: "vertical"
+				padding: 20
+				
+		BoxLayout:
+			size_hint: 1, 0.05
+			orientation: "horizontal"
+			spacing: 20
+
+			Label:
+				text: "Subtotal:"
+				text_size: self.size
+				size_hint: 0.95, 1
+				halign: "right"
+				valign: "middle"	
+				
+			Label:
+				id: txtSubtotal
+				text: "0"
+				size_hint: 0.05, 1
+
+		BoxLayout:
+			size_hint: 1, 0.05
+			orientation: "horizontal"
+			spacing: 20
+
+			Label:
+				text: "Service cost:"
+				text_size: self.size
+				size_hint: 0.95, 1
+				halign: "right"
+				valign: "middle"	
+				
+			Label:
+				id: txtServiceCost
+				text: "0"
+				size_hint: 0.05, 1
+
+		BoxLayout:
+			size_hint: 1, 0.05
+			orientation: "horizontal"
+			spacing: 20
+
+			Label:
+				text: "Total:"
+				text_size: self.size
+				size_hint: 0.95, 1
+				halign: "right"
+				valign: "middle"	
+				
+			Label:
+				id: txtTotal
+				text: "100"
+				size_hint: 0.05, 1
 
 		BoxLayout:
 			size_hint: 1, 0.1
 			orientation: "horizontal"
-			spacing: 20
 
 			Button:
 				text: "Back"
-				size_hint: 0.25, 1
+				size: 0.25, 1
 				on_press:
 					root.manager.go_back("ScannerView")
+
+<BasketLine@BoxLayout>:
+	size_y: 80
+	orientation: "horizontal"
+
+	txtBrand: "<no brand>"
+	txtDescription: "<no desciption>"
+	txtQuantity: "0"
+	txtTotal: "0"
+
+	Image:
+		size: 80,80
+		size_hint: 0.2, 1
+		halign: "middle"
+		valign: "middle"
+
+	Label: 
+		size_hint: 0.3, 1
+		text: root.txtBrand
+
+	Label:
+		size_hint: 0.4, 1
+		text: root.txtDescription
+
+	Label:
+		size_hint: 0.05, 1
+		text: root.txtQuantity
+
+	Label:
+		size_hint: 0.05, 1
+		text: root.txtTotal

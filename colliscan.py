@@ -1,8 +1,11 @@
 import kivy
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
 from kivy.properties import BoundedNumericProperty
 from kivy.clock import Clock
+from kivy.factory import Factory
 from colruyt import ColruytAPI
 #from barcode import BarcodeScanner
 import socket
@@ -13,6 +16,7 @@ import io
 class RootScreen(ScreenManager):
     api = None
     app = None
+    scanned = None
     def go_next(self, screenName):
         self.transition.direction = "left"
         self.current = screenName
@@ -29,7 +33,19 @@ class LoginView(Screen):
     def login(self):
         username = self.ids.txtUsername.text
         password = self.ids.txtPassword.text
-        self.manager.api.login(username, password)
+
+        if not username or not password:
+            popup = Popup(title="Error", content=Label(text="please fill in username and password"), size_hint=(None, None), size=(800, 300))
+            popup.open()
+            return
+
+        try:
+            self.manager.api.login(username, password)
+        except ValueError as err:
+            popup = Popup(title="Error", content=Label(text="%s" % (err)), size_hint=(None, None), size=(600, 300))
+            popup.open()
+            return    
+
         self.manager.app.config.set("credentials", "username", username)
         self.manager.app.config.set("credentials", "password", password)
         self.manager.app.config.write()
@@ -45,8 +61,15 @@ class ProductView(Screen):
 
     def getProduct(self):
         api = self.manager.api
-        barcode = self.manager.app.scanned
-        response = api.search(barcode)
+        barcode = self.manager.scanned
+        try:
+            response = api.search(barcode)
+        except ValueError as err:
+            popup = Popup(title="Error", content=Label(text="%s" % (err)), size_hint=(None, None), size=(800, 300))
+            popup.open()
+            self.manager.go_back("ScannerView")
+            return
+
         print "zoeken van product met barcode %s: %s" % (barcode, response["status"]["meaning"])
 
         self.amount = 1
@@ -102,6 +125,11 @@ class ProductView(Screen):
 class ScannerView(Screen):
     def on_leave(self):
         Clock.unschedule(self.scan_callback)
+        self.ids.txtBarcode.text = ""
+
+    def search(self):
+        self.manager.scanned = self.ids.txtBarcode.text
+        self.manager.go_next("ProductView")
 
     def logout(self):
         Clock.unschedule(self.scan_callback)
@@ -115,13 +143,14 @@ class ScannerView(Screen):
         #image = App.get_running_app().scanner.scan()
         image = "5449000011527"
         if image is not None:
-            self.manager.app.scanned = image
+            self.manager.scanned = image
             self.manager.go_next("ProductView")
             return False # stop the clock callback
         return True # continue the clock callback
 
     def setCallback(self):
-        Clock.schedule_interval(self.scan_callback, 3) # scan every 2 seconds
+        pass
+        #Clock.schedule_interval(self.scan_callback, 3) # scan every 2 seconds
         #self.ids.product_description.text = "Your IP is %s" % (self.get_ip_address("en0"))
 
 class IpView(Screen):
@@ -140,10 +169,29 @@ class IpView(Screen):
         )[20:24])
 
 class BasketView(Screen):
-    pass
+    def on_pre_enter(self):
+        self.ids.articles.clear_widgets()
+        basket = self.manager.api.show_basket()
+        for category in basket["data"]["articles"]:
+            #category["colruyt.cogomw.bo.RestTreeBranch"]["description"]
+            for article in category["list"]:
+                self.add_article(article) 
+        self.ids.txtSubtotal.text = basket["data"]["subTotal"]
+        self.ids.txtServiceCost.text = basket["data"]["serviceCost"]
+        self.ids.txtTotal.text = basket["data"]["total"]
+
+    def add_article(self, article):
+        #overviewImage
+        #unitPrice
+        #lineTotalPrice
+        article_inst = Factory.BasketLine()
+        article_inst.txtBrand = article["brand"]
+        article_inst.txtDescription = article["description"]
+        article_inst.txtQuantity = article["quantity"]
+        article_inst.txtTotal = article["lineTotalPrice"]
+        self.ids.articles.add_widget(article_inst)
 
 class ColliScanApp(App):
-    scanned = None
     #scanner = None 
     manager = None
 
