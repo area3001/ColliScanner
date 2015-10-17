@@ -153,7 +153,7 @@ class ScannerView(Screen):
 
 class IpView(Screen):
     def on_pre_enter(self):
-        self.ids.lblip.text = "Your IP is %s" % (self.get_ip_address("eth0"))
+        self.ids.lblIp.text = "Your IP is %s" % (self.get_ip_address("eth0"))
 
     def get_ip_address(self, ifname):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
