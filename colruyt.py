@@ -83,7 +83,7 @@ class ColruytAPI:
 		body = "oAuth=%s" % (self.token)
 		return self.request(path, body)
 
-	def get_product_image(self, path):
+	def get_product_image(self, path, productId):
 		path = path.replace("200x200", "500x500")
 		uri = "https://colruyt.collectandgo.be/cogo"
 		headers = {
@@ -101,5 +101,8 @@ class ColruytAPI:
 				"GET",
 				headers=headers)
 		if response.status == 200:
-			return content
+			filename = "img/product_%s.jpg" % (productId)
+			with open(filename, 'wb') as f:
+    			f.write(content)
+			return filename
 		return None
