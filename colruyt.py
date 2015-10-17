@@ -26,6 +26,8 @@ class ColruytAPI:
 		if username is not None and password is not None:
 			self.login(username, password)
 
+	def loggedIn(self):
+		return token
 
 	def request(self, path, body):
 		target = urlparse(self.uri+self.basePath+path)
@@ -61,6 +63,7 @@ class ColruytAPI:
 		response = self.request(path, body)
 		if not self.responseIsSuccess(response):
 			raise ValueError("Logout failed")
+		self.token = ""
 
 	def search(self, barcode):
 		path = "/articles/search.json"

@@ -1,0 +1,117 @@
+#:kivy 1.9.0
+
+<RootScreen>:
+	LoginView:
+    ProductView:
+    IpView:
+
+<LoginView>:
+	name: "LoginView"
+	GridLayout:
+		cols: 2
+		Label:
+			text: "username"
+		TextInput:
+			id: txtUsername
+			multiline: False
+		Label:
+			text: "password"
+		TextInput:
+			id: txtPassword
+			password: True
+			multiline: False
+		Button:
+			text: "Login"
+			on_press: root.login()
+
+
+<ProductView>:
+	name: "ProductView"
+	on_pre_enter:
+		self.getProduct()
+	BoxLayout:
+		size: root.size
+		orientation: "vertical"
+		padding: 20
+		spacing: 10
+
+		AsyncImage:
+			id: product_image
+			size_hint: 1, 0.65
+			source: 'https://colruyt.collectandgo.be/cogo/step/JPG/JPG/500x500/std.lang.all/64/86/asset-366486.jpg'
+
+		Label:
+			id: product_description
+			text: "Product desciption"
+			size_hint: 1, 0.1
+			halign: "center"
+
+		Label:
+			id: lblAmount
+			text: "%s" % (root.amount)
+			size_hint: 1, 0.1
+			halign: "center"
+
+		ProgressBar:
+			id: pbProgress
+			size_hint: 1, 0.05
+			max: 1000
+
+		BoxLayout:
+			size_hint: 1, 0.1
+			orientation: "horizontal"
+			spacing: 20
+			Button:
+				text: "Cancel"
+				size_hint: 0.25, 1
+				on_press:
+					root.manager.transition.direction = 'right'
+                	root.manager.current = 'IpView'
+			Button:
+				text: "-"
+				size_hint: 0.25, 1
+				on_press: root.decrease()
+			Button:
+				text: "+"
+				size_hint: 0.25, 1
+				on_press: root.increase()
+			Button:
+				text: "Ok"
+				size_hint: 0.25, 1
+				on_press: root.confirm()
+
+<IpView>:
+	name: "IpView"
+	on_pre_enter:
+		self.setCallback()
+	BoxLayout:
+		size: root.size
+		orientation: "vertical"
+		padding: 20
+		spacing: 10
+
+		Label:
+			text: "Scan your product"
+			size_hint: 1, 0.8
+			halign: "center"
+
+		Label:
+			id: lblIp
+			text: "Your IP is %s" % (root.ip)
+			size_hint: 1, 0.1
+			halign: "center"
+
+		BoxLayout:
+			size_hint: 1, 0.1
+			orientation: "horizontal"
+			spacing: 20
+
+			Button:
+				text: "Log out"
+				size_hint: 0.25, 1
+				on_press: root.logout()
+
+			Button:
+				text: "Exit"
+				size_hint: 0.25, 1
+				#on_press: root.exit()
