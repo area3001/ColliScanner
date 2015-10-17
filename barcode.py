@@ -12,21 +12,23 @@ class BarcodeScanner(Thread):
 		self.stream = io.BytesIO()
 		self.camera = picamera.PiCamera()
 		self.camera.resolution = (resolutionX, resolutionY)
+		self.quit = False
 		Thread.__init__(self)
 
 	def setCallback(self, callback):
 		self.callback = callback
 
 	def run(self):
+		self.quit = False
 		self.scan()
 
 	def terminate(self):
-		if not self.camera.closed:
+		self.quit = True
+		if not self.camera.closed():
 			self.camera.close()
-
+		
 	def scan(self):
-		symbols = []
-		while len(symbols) == 0:
+		while not self.quit:
 			self.stream = io.BytesIO()
 			self.camera.capture(self.stream, format="jpeg")
 
@@ -45,10 +47,8 @@ class BarcodeScanner(Thread):
 			# scan the image for barcodes
 			self.scanner.scan(image)
 
-			# extract results
-			symbols = image
+			if any(True for _ in image):
+				self.callback(image)
+				self.quit = True
 
-			# clean up
-			del(image)
-
-		self.callback(symbols)
+		

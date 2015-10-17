@@ -122,16 +122,16 @@ class ProductView(Screen):
 
 class ScannerView(Screen):
 	def on_leave(self):
-		self.manager.scanner.stop()
+		self.manager.scanner.terminate()
 		self.ids.txtBarcode.text = ""
 
 	def search(self):
-		self.manager.scanner.stop()
+		self.manager.scanner.terminate()
 		self.manager.scanned = self.ids.txtBarcode.text
 		self.manager.go_next("ProductView")
 
 	def logout(self):
-		self.manager.scanner.stop()
+		self.manager.scanner.terminate()
 		self.manager.api.logout()
 		self.manager.app.config.set("credentials", "username", "")
 		self.manager.app.config.set("credentials", "password", "")
@@ -144,7 +144,7 @@ class ScannerView(Screen):
 			print "decoded %s symbol, %s" % (symbol.type, symbol.data)
 			self.manager.scanned = symbol.data
 			self.manager.go_next("ProductView")
-			self.manager.scanner.stop()
+			self.manager.scanner.terminate()
 
 	def setCallback(self):
 		self.manager.scanner.setCallback(self.scan_callback)
