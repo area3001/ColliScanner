@@ -19,10 +19,6 @@ class RootScreen(ScreenManager):
     scanned = None
     scanner = None
 
-    def build(self):
-        self.scanner = BarcodeScanner(800, 600)
-        return self
-
     def go_next(self, screenName):
         self.transition.direction = "left"
         self.current = screenName
@@ -211,7 +207,9 @@ class ColliScanApp(App):
         password = config.get("credentials", "password")
 
         self.manager = RootScreen()
-        self.manager.app = self 
+        self.manager.app = self
+        self.manager.scanner = BarcodeScanner(800, 600)
+
 
         if username and password:
             self.manager.api = ColruytAPI(username, password)
