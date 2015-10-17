@@ -1,3 +1,4 @@
+import kivy
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
 from kivy.properties import BoundedNumericProperty
@@ -11,7 +12,13 @@ import struct
 import io
 
 class RootScreen(ScreenManager):
-    pass
+    def go_next(self, screenName):
+        self.transition.direction = "left"
+        self.current = screenName
+
+    def go_back(self, screenName):
+        self.transition.direction = "right"
+        self.current = screenName
 
 class LoginView(Screen):
     def on_leave(self):
@@ -26,8 +33,7 @@ class LoginView(Screen):
         App.get_running_app().config.set("credentials", "username", username)
         App.get_running_app().config.set("credentials", "password", password)
         App.get_running_app().config.write()
-        self.manager.transition.direction = "left"
-        self.manager.current = "ScannerView"
+        self.manager.go_next("ScannerView")
 
 class ProductView(Screen):
     id = None
@@ -91,11 +97,9 @@ class ProductView(Screen):
 
     def add_product(self):
         api = App.get_running_app().api
-        print "%s stuks toevoegen" % (self.amount)
         response = api.add(self.id, self.amount, "S")
-        print "toevoegen aan de winkelmand: %s" % (response["status"]["meaning"])
-        self.manager.transition.direction = "right"
-        self.manager.current = "ScannerView"
+        print "%s stuks toevoegen aan de winkelmand: %s" % (self.amount, response["status"]["meaning"])
+        self.manager.go_back("ScannerView")
 
 class ScannerView(Screen):
     def on_leave(self):
@@ -107,16 +111,14 @@ class ScannerView(Screen):
         App.get_running_app().config.set("credentials", "username", "")
         App.get_running_app().config.set("credentials", "password", "")
         App.get_running_app().config.write()
-        self.manager.transition.direction = "right"
-        self.manager.current = "LoginView"
+        self.manager.go_back("LoginView")
 
     def scan_callback(self, dt):
         #image = App.get_running_app().scanner.scan()
         image = "5449000011527"
         if image is not None:
             App.get_running_app().scanned = image
-            self.manager.transition.direction = "left"
-            self.manager.current = "ProductView"
+            self.manager.go_next("ProductView")
             return False # stop the clock callback
         return True # continue the clock callback
 
@@ -165,7 +167,6 @@ class ColliScanApp(App):
         #self.scanner = BarcodeScanner(800, 600)
 
         if username and password:
-            print "Credentials found in config: %s %s" % (username, password)
             self.api = ColruytAPI(username, password)
             rootScreen.current = "ScannerView"
         else:

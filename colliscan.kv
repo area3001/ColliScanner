@@ -28,9 +28,6 @@
 		Button:
 			text: "Login"
 			on_press: root.login()
-		
-
-
 
 <ProductView>:
 	name: "ProductView"
@@ -72,8 +69,7 @@
 				text: "Cancel"
 				size_hint: 0.25, 1
 				on_press:
-					root.manager.transition.direction = "right"
-                	root.manager.current = "ScannerView"
+					root.manager.go_back("ScannerView")
 			Button:
 				text: "-"
 				size_hint: 0.25, 1
@@ -121,15 +117,13 @@
 				text: "View ip"
 				size_hint: 0.25, 1
 				on_press:
-					root.manager.transition.direction = "left"
-                	root.manager.current = "IpView"
+					root.manager.go_next("IpView")
 
 			Button:
 				text: "Basket"
 				size_hint: 0.25, 1
 				on_press:
-					root.manager.transition.direction = "left"
-                	root.manager.current = "BasketView"
+					root.manager.go_next("BasketView")
 
 <IpView>:
 	name: "IpView"
@@ -154,8 +148,7 @@
 				text: "Back"
 				size_hint: 0.25, 1
 				on_press:
-					root.manager.transition.direction = "right"
-                	root.manager.current = "ScannerView"
+					root.manager.go_back("ScannerView")
 
 <BasketView>:
 	name: "BasketView"
@@ -180,5 +173,4 @@
 				text: "Back"
 				size_hint: 0.25, 1
 				on_press:
-					root.manager.transition.direction = "right"
-                	root.manager.current = "ScannerView"
+					root.manager.go_back("ScannerView")
