@@ -122,15 +122,16 @@ class ProductView(Screen):
 
 class ScannerView(Screen):
 	def on_leave(self):
-		Clock.unschedule(self.scan_callback)
+		self.manager.scanner.stop()
 		self.ids.txtBarcode.text = ""
 
 	def search(self):
+		self.manager.scanner.stop()
 		self.manager.scanned = self.ids.txtBarcode.text
 		self.manager.go_next("ProductView")
 
 	def logout(self):
-		Clock.unschedule(self.scan_callback)
+		self.manager.scanner.stop()
 		self.manager.api.logout()
 		self.manager.app.config.set("credentials", "username", "")
 		self.manager.app.config.set("credentials", "password", "")
