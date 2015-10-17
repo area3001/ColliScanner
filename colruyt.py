@@ -103,6 +103,6 @@ class ColruytAPI:
 		if response.status == 200:
 			filename = "img/product_%s.jpg" % (productId)
 			with open(filename, 'wb') as f:
-    			f.write(content)
+				f.write(content)
 			return filename
 		return None
