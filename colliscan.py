@@ -147,6 +147,7 @@ class ScannerView(Screen):
 			self.manager.scanner.terminate()
 
 	def setCallback(self):
+		self.manager.scanner = BarcodeScanner(800, 600)
 		self.manager.scanner.setCallback(self.scan_callback)
 		self.manager.scanner.start()
 
@@ -207,8 +208,6 @@ class ColliScanApp(App):
 
 		self.manager = RootScreen()
 		self.manager.app = self
-		self.manager.scanner = BarcodeScanner(800, 600)
-
 
 		if username and password:
 			self.manager.api = ColruytAPI(username, password)
