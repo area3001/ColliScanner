@@ -60,7 +60,7 @@ class ProductView(Screen):
 
         #Clock.schedule_once(self.timeout_callback, 10)
         self.progress = 1
-        Clock.schedule_interval(self.progress_callback, float(App.get_running_app().config.get("ColliScanner", "wait_time"))/100)
+        Clock.schedule_interval(self.progress_callback, float(App.get_running_app().config.getdefaultint("ColliScanner", "wait_time", 10))/100)
 
     def progress_callback(self, dt):
         self.progress += 1
@@ -129,7 +129,7 @@ class IpView(Screen):
 
     def on_pre_enter(self):
         #self.ip = self.get_ip_address("en0")
-        pass
+        self.ip = "test"
 
     def get_ip_address(self, ifname):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
