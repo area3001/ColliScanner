@@ -149,7 +149,7 @@ class ScannerView(Screen):
 
     def setCallback(self):
         pass
-        Clock.schedule_interval(self.scan_callback, 1/30.) # scan every 2 seconds
+        Clock.schedule_interval(self.scan_callback, 1) # scan every 2 seconds
 
 class IpView(Screen):
     def on_pre_enter(self):
