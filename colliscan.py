@@ -147,7 +147,7 @@ class ScannerView(Screen):
 			self.manager.scanner.stop()
 
 	def setCallback(self):
-		self.manager.scanner.setCallback(scan_callback)
+		self.manager.scanner.setCallback(self.scan_callback)
 		self.manager.scanner.start()
 
 class IpView(Screen):
