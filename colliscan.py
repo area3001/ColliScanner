@@ -27,7 +27,7 @@ class LoginView(Screen):
         App.get_running_app().config.set("credentials", "password", password)
         App.get_running_app().config.write()
         self.manager.transition.direction = "left"
-        self.manager.current = "IpView"
+        self.manager.current = "ScannerView"
 
 class ProductView(Screen):
     id = None
@@ -95,10 +95,12 @@ class ProductView(Screen):
         response = api.add(self.id, self.amount, "S")
         print "toevoegen aan de winkelmand: %s" % (response["status"]["meaning"])
         self.manager.transition.direction = "right"
-        self.manager.current = "IpView"
+        self.manager.current = "ScannerView"
 
-class IpView(Screen):
-    ip = "192.xxx.xxx.xxx"
+class ScannerView(Screen):
+    def on_leave(self):
+        Clock.unschedule(self.scan_callback)
+
     def logout(self):
         Clock.unschedule(self.scan_callback)
         App.get_running_app().api.logout()
@@ -122,6 +124,13 @@ class IpView(Screen):
         Clock.schedule_interval(self.scan_callback, 3) # scan every 2 seconds
         #self.ids.product_description.text = "Your IP is %s" % (self.get_ip_address("en0"))
 
+class IpView(Screen):
+    ip = "192.xxx.xxx.xxx"
+
+    def on_pre_enter(self):
+        #self.ip = self.get_ip_address("en0")
+        pass
+
     def get_ip_address(self, ifname):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         return socket.inet_ntoa(fcntl.ioctl(
@@ -129,6 +138,9 @@ class IpView(Screen):
             0x8915,  # SIOCGIFADDR
             struct.pack("256s", ifname[:15])
         )[20:24])
+
+class BasketView(Screen):
+    pass
 
 class ColliScanApp(App):
     api = None
@@ -155,7 +167,7 @@ class ColliScanApp(App):
         if username and password:
             print "Credentials found in config: %s %s" % (username, password)
             self.api = ColruytAPI(username, password)
-            rootScreen.current = "IpView"
+            rootScreen.current = "ScannerView"
         else:
             self.api = ColruytAPI()
             rootScreen.current = "LoginView"

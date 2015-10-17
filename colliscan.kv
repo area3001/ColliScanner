@@ -3,7 +3,9 @@
 <RootScreen>:
 	LoginView:
     ProductView:
+    ScannerView:
     IpView:
+    BasketView:
 
 <LoginView>:
 	name: "LoginView"
@@ -71,7 +73,7 @@
 				size_hint: 0.25, 1
 				on_press:
 					root.manager.transition.direction = "right"
-                	root.manager.current = "IpView"
+                	root.manager.current = "ScannerView"
 			Button:
 				text: "-"
 				size_hint: 0.25, 1
@@ -85,8 +87,8 @@
 				size_hint: 0.25, 1
 				on_press: root.confirm()
 
-<IpView>:
-	name: "IpView"
+<ScannerView>:
+	name: "ScannerView"
 	on_pre_enter:
 		self.setCallback()
 	BoxLayout:
@@ -97,13 +99,7 @@
 
 		Label:
 			text: "Scan your product"
-			size_hint: 1, 0.8
-			halign: "center"
-
-		Label:
-			id: lblIp
-			text: "Your IP is %s" % (root.ip)
-			size_hint: 1, 0.1
+			size_hint: 1, 0.9
 			halign: "center"
 
 		BoxLayout:
@@ -112,11 +108,77 @@
 			spacing: 20
 
 			Button:
+				text: "Exit"
+				size_hint: 0.25, 1
+				on_press: app.stop()
+
+			Button:
 				text: "Log out"
 				size_hint: 0.25, 1
 				on_press: root.logout()
 
 			Button:
-				text: "Exit"
+				text: "View ip"
 				size_hint: 0.25, 1
-				on_press: app.stop()
+				on_press:
+					root.manager.transition.direction = "left"
+                	root.manager.current = "IpView"
+
+			Button:
+				text: "Basket"
+				size_hint: 0.25, 1
+				on_press:
+					root.manager.transition.direction = "left"
+                	root.manager.current = "BasketView"
+
+<IpView>:
+	name: "IpView"
+	BoxLayout:
+		size: root.size
+		orientation: "vertical"
+		padding: 20
+		spacing: 10
+
+		Label:
+			id: lblIp
+			text: "Your IP is %s" % (root.ip)
+			size_hint: 1, 0.9
+			halign: "center"
+
+		BoxLayout:
+			size_hint: 1, 0.1
+			orientation: "horizontal"
+			spacing: 20
+
+			Button:
+				text: "Back"
+				size_hint: 0.25, 1
+				on_press:
+					root.manager.transition.direction = "right"
+                	root.manager.current = "ScannerView"
+
+<BasketView>:
+	name: "BasketView"
+	BoxLayout:
+		size: root.size
+		orientation: "vertical"
+		padding: 20
+		spacing: 10
+
+		Label:
+			id: lblIp
+			text: "Basket"
+			size_hint: 1, 0.9
+			halign: "center"
+
+		BoxLayout:
+			size_hint: 1, 0.1
+			orientation: "horizontal"
+			spacing: 20
+
+			Button:
+				text: "Back"
+				size_hint: 0.25, 1
+				on_press:
+					root.manager.transition.direction = "right"
+                	root.manager.current = "ScannerView"
