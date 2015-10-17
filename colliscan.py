@@ -181,7 +181,7 @@ class BasketView(Screen):
 		#lineTotalPrice
 		productimage = self.manager.api.get_product_image(article["overviewImage"], article["id"])
 		article_inst = Factory.BasketLine()
-		article_inst.imgProduct.data = productimage
+		article_inst.imgProduct = productimage
 		article_inst.txtBrand = article["brand"]
 		article_inst.txtDescription = article["description"]
 		article_inst.txtQuantity = article["quantity"]
