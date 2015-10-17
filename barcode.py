@@ -17,11 +17,11 @@ class BarcodeScanner(Thread):
 	def setCallback(self, callback):
 		self.callback = callback
 
-    def run(self):
-        self.scan()
+	def run(self):
+		self.scan()
 
-    def terminate(self):
-        if not self.camera.closed:
+	def terminate(self):
+		if not self.camera.closed:
 			self.camera.close()
 
 	def scan(self):
