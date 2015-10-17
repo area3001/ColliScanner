@@ -27,7 +27,7 @@ class ColruytAPI:
 			self.login(username, password)
 
 	def loggedIn(self):
-		return token
+		return self.token
 
 	def request(self, path, body):
 		target = urlparse(self.uri+self.basePath+path)

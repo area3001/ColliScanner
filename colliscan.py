@@ -10,7 +10,6 @@ import fcntl
 import struct
 import io
 
-
 class RootScreen(ScreenManager):
     pass
 
@@ -27,12 +26,13 @@ class LoginView(Screen):
         App.get_running_app().config.set("credentials", "username", username)
         App.get_running_app().config.set("credentials", "password", password)
         App.get_running_app().config.write()
+        self.manager.transition.direction = "left"
         self.manager.current = "IpView"
 
 class ProductView(Screen):
     id = None
     amount = BoundedNumericProperty(1, min=1, max=100, errorvalue=1)
-    progress = BoundedNumericProperty(1, min=1, max=1000, errorvalue=1)
+    progress = BoundedNumericProperty(1, min=0, max=100, errorvalue=1)
 
     def on_leave(self):
         Clock.unschedule(self.progress_callback)
@@ -60,21 +60,28 @@ class ProductView(Screen):
 
         #Clock.schedule_once(self.timeout_callback, 10)
         self.progress = 1
-        Clock.schedule_interval(self.progress_callback, 5/100)
+        Clock.schedule_interval(self.progress_callback, float(App.get_running_app().config.get("ColliScanner", "wait_time"))/100)
 
     def progress_callback(self, dt):
         self.progress += 1
         self.ids.pbProgress.value = self.progress
-        if self.progress == 1000:
+        if self.progress == 100:
             self.add_product()
             return False
         return True
 
     def increase(self):
         self.amount += 1
+        self.stop_timer()
 
     def decrease(self):
         self.amount -= 1
+        self.stop_timer()
+
+    def stop_timer(self):
+        Clock.unschedule(self.progress_callback)
+        self.progress = 0
+        self.ids.pbProgress.value = self.progress
 
     def confirm(self):
         self.add_product()
@@ -87,15 +94,18 @@ class ProductView(Screen):
         print "%s stuks toevoegen" % (self.amount)
         response = api.add(self.id, self.amount, "S")
         print "toevoegen aan de winkelmand: %s" % (response["status"]["meaning"])
+        self.manager.transition.direction = "right"
         self.manager.current = "IpView"
 
 class IpView(Screen):
     ip = "192.xxx.xxx.xxx"
     def logout(self):
+        Clock.unschedule(self.scan_callback)
         App.get_running_app().api.logout()
         App.get_running_app().config.set("credentials", "username", "")
         App.get_running_app().config.set("credentials", "password", "")
         App.get_running_app().config.write()
+        self.manager.transition.direction = "right"
         self.manager.current = "LoginView"
 
     def scan_callback(self, dt):
@@ -103,13 +113,13 @@ class IpView(Screen):
         image = "5449000011527"
         if image is not None:
             App.get_running_app().scanned = image
-            self.manager.transition.direction = 'left'
+            self.manager.transition.direction = "left"
             self.manager.current = "ProductView"
             return False # stop the clock callback
         return True # continue the clock callback
 
     def setCallback(self):
-        Clock.schedule_interval(self.scan_callback, 2) # scan every 2 seconds
+        Clock.schedule_interval(self.scan_callback, 3) # scan every 2 seconds
         #self.ids.product_description.text = "Your IP is %s" % (self.get_ip_address("en0"))
 
     def get_ip_address(self, ifname):
@@ -117,7 +127,7 @@ class IpView(Screen):
         return socket.inet_ntoa(fcntl.ioctl(
             s.fileno(),
             0x8915,  # SIOCGIFADDR
-            struct.pack('256s', ifname[:15])
+            struct.pack("256s", ifname[:15])
         )[20:24])
 
 class ColliScanApp(App):
@@ -131,7 +141,8 @@ class ColliScanApp(App):
         })
 
     def on_stop(self):
-        self.api.logout()
+        if self.api.loggedIn():
+            self.api.logout()
 
     def build(self):
         config = self.config
@@ -150,5 +161,5 @@ class ColliScanApp(App):
             rootScreen.current = "LoginView"
         return rootScreen
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ColliScanApp().run()

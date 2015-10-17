@@ -21,8 +21,13 @@
 			password: True
 			multiline: False
 		Button:
+			text: "Exit"
+			on_press: app.stop()
+		Button:
 			text: "Login"
 			on_press: root.login()
+		
+
 
 
 <ProductView>:
@@ -37,8 +42,8 @@
 
 		AsyncImage:
 			id: product_image
-			size_hint: 1, 0.65
-			source: 'https://colruyt.collectandgo.be/cogo/step/JPG/JPG/500x500/std.lang.all/64/86/asset-366486.jpg'
+			size_hint: 1, 0.69
+			source: "https://colruyt.collectandgo.be/cogo/step/JPG/JPG/500x500/std.lang.all/64/86/asset-366486.jpg"
 
 		Label:
 			id: product_description
@@ -48,14 +53,14 @@
 
 		Label:
 			id: lblAmount
-			text: "%s" % (root.amount)
+			text: "%s stuk(s)" % (root.amount)
 			size_hint: 1, 0.1
 			halign: "center"
 
 		ProgressBar:
 			id: pbProgress
-			size_hint: 1, 0.05
-			max: 1000
+			size_hint: 1, 0.01
+			max: 100
 
 		BoxLayout:
 			size_hint: 1, 0.1
@@ -65,8 +70,8 @@
 				text: "Cancel"
 				size_hint: 0.25, 1
 				on_press:
-					root.manager.transition.direction = 'right'
-                	root.manager.current = 'IpView'
+					root.manager.transition.direction = "right"
+                	root.manager.current = "IpView"
 			Button:
 				text: "-"
 				size_hint: 0.25, 1
@@ -114,4 +119,4 @@
 			Button:
 				text: "Exit"
 				size_hint: 0.25, 1
-				#on_press: root.exit()
+				on_press: app.stop()
