@@ -137,19 +137,17 @@ class ScannerView(Screen):
         self.manager.app.config.write()
         self.manager.go_back("LoginView")
 
-    def scan_callback(self, dt):
-        image = self.manager.scanner.scan()
+    def scan_callback(self, image):
         for symbol in image:
             # barcodes found
             print "decoded %s symbol, %s" % (symbol.type, symbol.data)
             self.manager.scanned = symbol.data
             self.manager.go_next("ProductView")
-            return False # stop the clock callback
-        return True # continue the clock callback
+            self.manager.scanner.stop()
 
     def setCallback(self):
-        pass
-        Clock.schedule_interval(self.scan_callback, 1) # scan every 2 seconds
+        self.manager.scanner.setCallback(scan_callback)
+        self.manager.scanner.start()
 
 class IpView(Screen):
     def on_pre_enter(self):
