@@ -1,8 +1,7 @@
 import kivy
 from kivy.app import App
-from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
+from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import BoundedNumericProperty
-from kivy.config import Config
 from kivy.clock import Clock
 from colruyt import ColruytAPI
 #from barcode import BarcodeScanner
@@ -12,6 +11,8 @@ import struct
 import io
 
 class RootScreen(ScreenManager):
+    api = None
+    app = None
     def go_next(self, screenName):
         self.transition.direction = "left"
         self.current = screenName
@@ -28,11 +29,10 @@ class LoginView(Screen):
     def login(self):
         username = self.ids.txtUsername.text
         password = self.ids.txtPassword.text
-        print "username: %s, password: %s" % (username, password)
-        App.get_running_app().api.login(username, password)
-        App.get_running_app().config.set("credentials", "username", username)
-        App.get_running_app().config.set("credentials", "password", password)
-        App.get_running_app().config.write()
+        self.manager.api.login(username, password)
+        self.manager.app.config.set("credentials", "username", username)
+        self.manager.app.config.set("credentials", "password", password)
+        self.manager.app.config.write()
         self.manager.go_next("ScannerView")
 
 class ProductView(Screen):
@@ -41,12 +41,11 @@ class ProductView(Screen):
     progress = BoundedNumericProperty(1, min=0, max=100, errorvalue=1)
 
     def on_leave(self):
-        Clock.unschedule(self.progress_callback)
+        self.stop_timer()
 
     def getProduct(self):
-
-        api = App.get_running_app().api
-        barcode = App.get_running_app().scanned
+        api = self.manager.api
+        barcode = self.manager.app.scanned
         response = api.search(barcode)
         print "zoeken van product met barcode %s: %s" % (barcode, response["status"]["meaning"])
 
@@ -96,8 +95,7 @@ class ProductView(Screen):
         self.add_product()
 
     def add_product(self):
-        api = App.get_running_app().api
-        response = api.add(self.id, self.amount, "S")
+        response = self.manager.api.add(self.id, self.amount, "S")
         print "%s stuks toevoegen aan de winkelmand: %s" % (self.amount, response["status"]["meaning"])
         self.manager.go_back("ScannerView")
 
@@ -107,17 +105,17 @@ class ScannerView(Screen):
 
     def logout(self):
         Clock.unschedule(self.scan_callback)
-        App.get_running_app().api.logout()
-        App.get_running_app().config.set("credentials", "username", "")
-        App.get_running_app().config.set("credentials", "password", "")
-        App.get_running_app().config.write()
+        self.manager.api.logout()
+        self.manager.app.config.set("credentials", "username", "")
+        self.manager.app.config.set("credentials", "password", "")
+        self.manager.app.config.write()
         self.manager.go_back("LoginView")
 
     def scan_callback(self, dt):
         #image = App.get_running_app().scanner.scan()
         image = "5449000011527"
         if image is not None:
-            App.get_running_app().scanned = image
+            self.manager.app.scanned = image
             self.manager.go_next("ProductView")
             return False # stop the clock callback
         return True # continue the clock callback
@@ -145,9 +143,10 @@ class BasketView(Screen):
     pass
 
 class ColliScanApp(App):
-    api = None
     scanned = None
     #scanner = None 
+    manager = None
+
     def build_config(self, config):
         config.setdefaults("credentials", {
             "username": "",
@@ -155,24 +154,26 @@ class ColliScanApp(App):
         })
 
     def on_stop(self):
-        if self.api.loggedIn():
-            self.api.logout()
+        if self.manager:
+            if self.manager.api.loggedIn():
+                self.manager.api.logout()
 
     def build(self):
         config = self.config
         username = config.get("credentials", "username")
         password = config.get("credentials", "password")
 
-        rootScreen = RootScreen()
+        self.manager = RootScreen()
+        self.manager.app = self
         #self.scanner = BarcodeScanner(800, 600)
 
         if username and password:
-            self.api = ColruytAPI(username, password)
-            rootScreen.current = "ScannerView"
+            self.manager.api = ColruytAPI(username, password)
+            self.manager.current = "ScannerView"
         else:
-            self.api = ColruytAPI()
-            rootScreen.current = "LoginView"
-        return rootScreen
+            self.manager.api = ColruytAPI()
+            self.manager.current = "LoginView"
+        return self.manager
 
 if __name__ == "__main__":
     ColliScanApp().run()
