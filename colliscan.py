@@ -146,10 +146,9 @@ class ProductView(Screen):
 			self.add_failed("Fout bij toevoegen: %s" % (response["status"]["meaning"]))
 
 
-	def add_failed(self, err)
-		response = self.manager.api.add(self.id, self.amount, "S")
-		print "%s stuks toevoegen aan de winkelmand: %s" % (self.amount, response["status"]["meaning"])
-		self.manager.go_back("ScannerView")
+	def add_failed(self, err):
+		popup = Popup(title="Error", content=Label(text="%s" % (err)), size_hint=(None, None), size=(800, 300))
+		popup.open()
 
 class ScannerView(Screen):
 	def on_leave(self):
