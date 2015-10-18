@@ -90,7 +90,8 @@ class ProductView(Screen):
 
 	def search_succes(self, req, content):
 		response = json.loads(content)
-		if self.manager.api.responseIsSuccess(response):		
+		api = self.manager.api
+		if api.responseIsSuccess(response):		
 			barcode = self.manager.scanned
 			print "zoeken van product met barcode %s: %s" % (barcode, response["status"]["meaning"])
 
