@@ -207,8 +207,10 @@ class IpView(Screen):
 		)[20:24])
 
 class BasketView(Screen):
-	def on_enter(self):
+	def on_pre_enter(self):
 		self.ids.articles.clear_widgets()
+
+	def on_enter(self):
 		self.manager.api.show_basket(self.basket_success, self.basket_failed)
 
 	def basket_success(self, req, content):
