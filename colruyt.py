@@ -86,20 +86,22 @@ class ColruytAPI:
 	def get_product_image(self, path):
 		path = path.replace("200x200", "500x500")
 		uri = "https://colruyt.collectandgo.be/cogo"
-		headers = {
-			"Host": "colruyt.collectandgo.be",
-			"Proxy-Connection": "keep-alive",
-			"Accept-Encoding": "gzip, deflate",
-			"Accept-Language": "nl-nl",
-			"Accept": "*/*",
-			"Connection": "keep-alive",
-			"User-Agent": "Collect&Go/3.3.1.11218 CFNetwork/758.1.3 Darwin/15.0.0"
-		}
-		target = urlparse(uri+path)
-		response, content = self.h.request(
-				target.geturl(),
-				"GET",
-				headers=headers)
-		if response.status == 200:
-			return content
-		return None
+		return uri + path
+
+		# headers = {
+		# 	"Host": "colruyt.collectandgo.be",
+		# 	"Proxy-Connection": "keep-alive",
+		# 	"Accept-Encoding": "gzip, deflate",
+		# 	"Accept-Language": "nl-nl",
+		# 	"Accept": "*/*",
+		# 	"Connection": "keep-alive",
+		# 	"User-Agent": "Collect&Go/3.3.1.11218 CFNetwork/758.1.3 Darwin/15.0.0"
+		# }
+		# target = urlparse(uri+path)
+		# response, content = self.h.request(
+		# 		target.geturl(),
+		# 		"GET",
+		# 		headers=headers)
+		# if response.status == 200:
+		# 	return content
+		# return None

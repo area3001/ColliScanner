@@ -81,7 +81,7 @@ class ProductView(Screen):
 		productImagePath = response["data"]["searchResults"][0]["list"][0]["overviewImage"]
 		price = response["data"]["searchResults"][0]["list"][0]["price"]
 
-		image = api.get_product_image(productImagePath, productId)
+		image = api.get_product_image(productImagePath)
 
 		self.ids.product_image.source = image
 		self.ids.product_description.text = "%s - %s : %s euro" % (productBrand, productDescription, price)
@@ -179,7 +179,7 @@ class BasketView(Screen):
 		#overviewImage
 		#unitPrice
 		#lineTotalPrice
-		productimage = self.manager.api.get_product_image(article["overviewImage"], article["id"])
+		productimage = self.manager.api.get_product_image(article["overviewImage"])
 		article_inst = Factory.BasketLine()
 		article_inst.imgProduct = productimage
 		article_inst.txtBrand = article["brand"]
