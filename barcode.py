@@ -28,7 +28,7 @@ class BarcodeScanner(Thread):
 			self.camera.close()
 		
 	def scan(self):
-		while not self.quit:
+		while not self.quit and not self.camera.closed:
 			self.stream = io.BytesIO()
 			self.camera.capture(self.stream, format="jpeg")
 
