@@ -22,7 +22,16 @@ class ColruytAPI:
 			"User-Agent": "Collect&Go/3.3.1.11218 CFNetwork/758.1.3 Darwin/15.0.0"
 		}
 		if username is not None and password is not None:
-			self.login(username, password)
+			self.login(username, password, self.login_success, self.login_failed)
+	
+	def login_success(self, response):
+		if self.responseIsSuccess(response):
+			self.token = response["data"]["oAuth"]
+		else:
+			self.login_failed("Login failed: %s" % (response["status"]["meaning"])
+
+	def login_failed(self, err):
+		raise ValueError(err)
 
 	def loggedIn(self):
 		return self.token
@@ -52,7 +61,7 @@ class ColruytAPI:
 		body = "oAuth=%s&barcode=%s" % (self.token, barcode)
 		self.request(path, body, callback_success, callback_failure)
 
-	def add(self, id, quantity, weigtCode="G", callback_success, callback_failure):
+	def add(self, id, quantity, weigtCode, callback_success, callback_failure):
 		path = "/basket/articles/add.json"
 		body = "id=%s&weightCode=%s&comment=&quantity=%s&oAuth=%s" % (id, weigtCode, quantity, self.token)
 		self.request(path, body, callback_success, callback_failure)
