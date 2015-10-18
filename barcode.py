@@ -26,7 +26,6 @@ class BarcodeScanner(Thread):
 		self.quit = True
 		if not self.camera.closed:
 			self.camera.close()
-			del(self.camera)
 		
 	def scan(self):
 		while not self.quit:
