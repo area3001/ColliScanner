@@ -1,6 +1,11 @@
 from kivy.network.urlrequest import UrlRequest
 import json
 
+try:
+	from urlparse import urlparse
+except ImportError:
+	from urllib.parse import urlparse
+	
 class ColruytAPI:
 	def __init__(self, username = None, password = None):
 		self.token = ""
