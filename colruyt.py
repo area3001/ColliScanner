@@ -28,7 +28,7 @@ class ColruytAPI:
 		if self.responseIsSuccess(response):
 			self.token = response["data"]["oAuth"]
 		else:
-			self.login_failed("Login failed: %s" % (response["status"]["meaning"])
+			self.login_failed("Login failed: %s" % (response["status"]["meaning"]))
 
 	def login_failed(self, err):
 		raise ValueError(err)
