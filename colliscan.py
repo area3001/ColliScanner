@@ -53,17 +53,21 @@ class LoginView(Screen):
 			popup.open()
 			return
 
-		try:
-			self.manager.api.login(username, password)
-		except ValueError as err:
-			popup = Popup(title="Error", content=Label(text="%s" % (err)), size_hint=(None, None), size=(600, 300))
-			popup.open()
-			return    
+		self.manager.api.login(username, password, self.login_succes, self.login_failed)
 
-		self.manager.app.config.set("credentials", "username", username)
-		self.manager.app.config.set("credentials", "password", password)
-		self.manager.app.config.write()
-		self.manager.go_next("ScannerView")
+	def login_succes(self, response):
+		if self.manager.responseIsSuccess(response):
+			self.manager.api.token = response["data"]["oAuth"]
+			self.manager.app.config.set("credentials", "username", username)
+			self.manager.app.config.set("credentials", "password", password)
+			self.manager.app.config.write()
+			self.manager.go_next("ScannerView")
+		else:
+			self.login_failure_callback("Login failed: %s" % (response["status"]["meaning"]))
+		
+	def login_failed(self, err):
+		popup = Popup(title="Error", content=Label(text="%s" % (err)), size_hint=(None, None), size=(600, 300))
+		popup.open()
 
 class ProductView(Screen):
 	id = None
@@ -76,32 +80,35 @@ class ProductView(Screen):
 	def getProduct(self):
 		api = self.manager.api
 		barcode = self.manager.scanned
-		try:
-			response = api.search(barcode)
-		except ValueError as err:
-			popup = Popup(title="Error", content=Label(text="%s" % (err)), size_hint=(None, None), size=(800, 300))
-			popup.open()
-			self.manager.go_back("ScannerView")
-			return
+		response = api.search(barcode, self.search_succes, self.search_failed)
+	
+	def search_failed(self, err):
+		popup = Popup(title="Error", content=Label(text="%s" % (err)), size_hint=(None, None), size=(800, 300))
+		popup.open()
+		self.manager.go_back("ScannerView")
 
-		print "zoeken van product met barcode %s: %s" % (barcode, response["status"]["meaning"])
+	def search_succes(self, response):
+		if self.manager.api.responseIsSuccess(response):		
+			barcode = self.manager.scanned
+			print "zoeken van product met barcode %s: %s" % (barcode, response["status"]["meaning"])
 
-		self.amount = 1
-		self.id = productId = response["data"]["searchResults"][0]["list"][0]["id"]
-		productBrand = response["data"]["searchResults"][0]["list"][0]["brand"]
-		productDescription = response["data"]["searchResults"][0]["list"][0]["description"]
-		productImagePath = response["data"]["searchResults"][0]["list"][0]["overviewImage"]
-		price = response["data"]["searchResults"][0]["list"][0]["price"]
+			self.amount = 1
+			self.id = productId = response["data"]["searchResults"][0]["list"][0]["id"]
+			productBrand = response["data"]["searchResults"][0]["list"][0]["brand"]
+			productDescription = response["data"]["searchResults"][0]["list"][0]["description"]
+			productImagePath = response["data"]["searchResults"][0]["list"][0]["overviewImage"]
+			price = response["data"]["searchResults"][0]["list"][0]["price"]
+			image = api.get_product_image(productImagePath)
 
-		image = api.get_product_image(productImagePath)
+			self.ids.product_image.source = image
+			self.ids.product_description.text = "%s - %s : %s euro" % (productBrand, productDescription, price)
 
-		self.ids.product_image.source = image
-		self.ids.product_description.text = "%s - %s : %s euro" % (productBrand, productDescription, price)
+			print "Product [%s] %s - %s : %s euro" % (productId, productBrand, productDescription, price)
 
-		print "Product [%s] %s - %s : %s euro" % (productId, productBrand, productDescription, price)
-
-		self.progress = 0
-		Clock.schedule_interval(self.progress_callback, float(App.get_running_app().config.getdefaultint("ColliScanner", "wait_time", 10))/100)
+			self.progress = 0
+			Clock.schedule_interval(self.progress_callback, float(App.get_running_app().config.getdefaultint("ColliScanner", "wait_time", 10))/100)
+		else:
+			self.search_failed("Search failed: %s" % (response["status"]["meaning"]))
 
 	def progress_callback(self, dt):
 		self.progress += 1
@@ -144,11 +151,20 @@ class ScannerView(Screen):
 
 	def logout(self):
 		self.manager.scanner.terminate()
-		self.manager.api.logout()
-		self.manager.app.config.set("credentials", "username", "")
-		self.manager.app.config.set("credentials", "password", "")
-		self.manager.app.config.write()
-		self.manager.go_back("LoginView")
+		self.manager.api.logout(self.logout_success, self.logout_failed)
+
+	def logout_success(self, result):
+		if self.manager.api.responseIsSuccess(result):
+			self.manager.app.config.set("credentials", "username", "")
+			self.manager.app.config.set("credentials", "password", "")
+			self.manager.app.config.write()
+			self.manager.go_back("LoginView")
+		else:
+			self.logout_failed("Login failed: %s" % (response["status"]["meaning"]))
+
+	def logout_failed(self, err):
+		popup = Popup(title="Error", content=Label(text="%s" % (err)), size_hint=(None, None), size=(800, 300))
+		popup.open()	
 
 	def scan_callback(self, image):
 		for symbol in image:
@@ -178,14 +194,23 @@ class IpView(Screen):
 class BasketView(Screen):
 	def on_enter(self):
 		self.ids.articles.clear_widgets()
-		basket = self.manager.api.show_basket()
-		for category in basket["data"]["articles"]:
-			#category["colruyt.cogomw.bo.RestTreeBranch"]["description"]
-			for article in category["list"]:
-				self.add_article(article) 
-		self.ids.txtSubtotal.text = basket["data"]["subTotal"]
-		self.ids.txtServiceCost.text = basket["data"]["serviceCost"]
-		self.ids.txtTotal.text = basket["data"]["total"]
+		self.manager.api.show_basket(self.basket_success, self.basket_failed)
+
+	def basket_success(self, response):
+		if self.manager.api.responseIsSuccess(response):
+			for category in response["data"]["articles"]:
+				#category["colruyt.cogomw.bo.RestTreeBranch"]["description"]
+				for article in category["list"]:
+					self.add_article(article) 
+			self.ids.txtSubtotal.text = response["data"]["subTotal"]
+			self.ids.txtServiceCost.text = response["data"]["serviceCost"]
+			self.ids.txtTotal.text = response["data"]["total"]
+		else:
+			self.basket_failed("Get basket failed: %s" % (response["status"]["meaning"]))
+
+	def basket_failed(self, err):
+		popup = Popup(title="Error", content=Label(text="%s" % (err)), size_hint=(None, None), size=(800, 300))
+		popup.open()
 
 	def add_article(self, article):
 		#overviewImage
