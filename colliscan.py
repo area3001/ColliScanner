@@ -139,8 +139,7 @@ class ProductView(Screen):
 		self.add_product()
 
 	def add_product(self):
-		self.manager.api.add(self.id, self.amount, "S". self.add_success, self.add_failed)
-		
+		self.manager.api.add(self.id, self.amount, "S", self.add_success, self.add_failed)
 
 	def add_success(self, req, content):
 		response = json.loads(content)
