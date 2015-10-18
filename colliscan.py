@@ -77,6 +77,7 @@ class ProductView(Screen):
 
 	def on_leave(self):
 		self.stop_timer()
+		self.ids.product_image.source = ""
 
 	def getProduct(self):
 		api = self.manager.api
