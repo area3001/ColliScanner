@@ -3,6 +3,7 @@ from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
+from kivy.uix.image import AsyncImage
 from kivy.properties import BoundedNumericProperty
 from kivy.clock import Clock
 from kivy.factory import Factory
@@ -26,6 +27,17 @@ class RootScreen(ScreenManager):
 	def go_back(self, screenName):
 		self.transition.direction = "right"
 		self.current = screenName
+
+class ColliAsyncImage(AsyncImage):
+	headers = {
+		"Host": "colruyt.collectandgo.be",
+		"Proxy-Connection": "keep-alive",
+		"Accept-Encoding": "gzip, deflate",
+		"Accept-Language": "nl-nl",
+		"Accept": "*/*",
+		"Connection": "keep-alive",
+		"User-Agent": "Collect&Go/3.3.1.11218 CFNetwork/758.1.3 Darwin/15.0.0"
+	}
 
 class LoginView(Screen):
 	def on_leave(self):

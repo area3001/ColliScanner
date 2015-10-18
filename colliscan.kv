@@ -39,20 +39,11 @@
 		padding: 20
 		spacing: 10
 
-		AsyncImage:
+		ColliAsyncImage:
 			id: product_image
 			size_hint: 1, 0.69
 			source: "https://colruyt.collectandgo.be/cogo/step/JPG/JPG/500x500/std.lang.all/64/86/asset-366486.jpg"
-			# headers: {
-			# 	"Host": "colruyt.collectandgo.be",
-			# 	"Proxy-Connection": "keep-alive",
-			# 	"Accept-Encoding": "gzip, deflate",
-			# 	"Accept-Language": "nl-nl",
-			# 	"Accept": "*/*",
-			# 	"Connection": "keep-alive",
-			# 	"User-Agent": "Collect&Go/3.3.1.11218 CFNetwork/758.1.3 Darwin/15.0.0"
-			# }
-		
+
 		Label:
 			id: product_description
 			text: "<none>"
@@ -284,21 +275,12 @@
 	txtTotal: "0"
 	imgProduct: ""
 
-	AsyncImage:
+	ColliAsyncImage:
 		source: root.imgProduct
 		size: 200,200
 		size_hint: 0.2, 1
 		halign: "middle"
 		valign: "middle"
-		# headers: {
-		# 	"Host": "colruyt.collectandgo.be",
-		# 	"Proxy-Connection": "keep-alive",
-		# 	"Accept-Encoding": "gzip, deflate",
-		# 	"Accept-Language": "nl-nl",
-		# 	"Accept": "*/*",
-		# 	"Connection": "keep-alive",
-		# 	"User-Agent": "Collect&Go/3.3.1.11218 CFNetwork/758.1.3 Darwin/15.0.0"
-		# }
 
 	Label: 
 		size_hint: 0.3, 1
