@@ -56,7 +56,8 @@ class LoginView(Screen):
 
 		self.manager.api.login(username, password, self.login_succes, self.login_failed)
 
-	def login_succes(self, req, response):
+	def login_succes(self, req, content):
+		response = json.loads(content)
 		if self.manager.api.responseIsSuccess(response):
 			self.manager.api.token = response["data"]["oAuth"]
 			self.manager.app.config.set("credentials", "username", username)
