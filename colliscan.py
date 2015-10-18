@@ -176,7 +176,7 @@ class IpView(Screen):
 		)[20:24])
 
 class BasketView(Screen):
-	def on_pre_enter(self):
+	def on_enter(self):
 		self.ids.articles.clear_widgets()
 		basket = self.manager.api.show_basket()
 		for category in basket["data"]["articles"]:
