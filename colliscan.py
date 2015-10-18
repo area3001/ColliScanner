@@ -13,6 +13,7 @@ import socket
 import fcntl
 import struct
 import io
+import json
 
 class RootScreen(ScreenManager):
 	api = None
@@ -87,7 +88,8 @@ class ProductView(Screen):
 		popup.open()
 		self.manager.go_back("ScannerView")
 
-	def search_succes(self, req, response):
+	def search_succes(self, req, content):
+		response = json.loads(content)
 		if self.manager.api.responseIsSuccess(response):		
 			barcode = self.manager.scanned
 			print "zoeken van product met barcode %s: %s" % (barcode, response["status"]["meaning"])
@@ -138,7 +140,8 @@ class ProductView(Screen):
 		self.manager.api.add(self.id, self.amount, "S". self.add_success, self.add_failed)
 		
 
-	def add_success(self, req, response):
+	def add_success(self, req, content):
+		response = json.loads(content)
 		if self.manager.api.responseIsSuccess(response):
 			print "%s stuks toevoegen aan de winkelmand: %s" % (self.amount, response["status"]["meaning"])
 			self.manager.go_back("ScannerView")
@@ -164,8 +167,9 @@ class ScannerView(Screen):
 		self.manager.scanner.terminate()
 		self.manager.api.logout(self.logout_success, self.logout_failed)
 
-	def logout_success(self, req, result):
-		if self.manager.api.responseIsSuccess(result):
+	def logout_success(self, req, content):
+		response = json.loads(content)
+		if self.manager.api.responseIsSuccess(response):
 			self.manager.app.config.set("credentials", "username", "")
 			self.manager.app.config.set("credentials", "password", "")
 			self.manager.app.config.write()
@@ -207,7 +211,8 @@ class BasketView(Screen):
 		self.ids.articles.clear_widgets()
 		self.manager.api.show_basket(self.basket_success, self.basket_failed)
 
-	def basket_success(self, req, response):
+	def basket_success(self, req, content):
+		response = json.loads(content)
 		if self.manager.api.responseIsSuccess(response):
 			for category in response["data"]["articles"]:
 				#category["colruyt.cogomw.bo.RestTreeBranch"]["description"]

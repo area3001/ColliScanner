@@ -1,9 +1,5 @@
 from kivy.network.urlrequest import UrlRequest
-
-try:
-	from urlparse import urlparse
-except ImportError:
-	from urllib.parse import urlparse
+import json
 
 class ColruytAPI:
 	def __init__(self, username = None, password = None):
@@ -24,13 +20,14 @@ class ColruytAPI:
 		if username is not None and password is not None:
 			self.login(username, password, self.login_success, self.login_failed)
 	
-	def login_success(self, req, response):
+	def login_success(self, req, content):
+		response = json.loads(content)
 		if self.responseIsSuccess(response):
 			self.token = response["data"]["oAuth"]
 		else:
 			self.login_failed("Login failed: %s" % (response["status"]["meaning"]))
 
-	def login_failed(self, req, err):
+	def login_failed(self, err):
 		raise ValueError(err)
 
 	def loggedIn(self):
