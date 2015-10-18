@@ -257,7 +257,7 @@ class ColliScanApp(App):
 	def on_stop(self):
 		if self.manager:
 			if self.manager.api.loggedIn():
-				self.manager.api.logout()
+				self.manager.api.logout(None, None)
 
 	def build(self):
 		config = self.config
