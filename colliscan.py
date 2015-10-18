@@ -55,7 +55,7 @@ class LoginView(Screen):
 
 		self.manager.api.login(username, password, self.login_succes, self.login_failed)
 
-	def login_succes(self, response):
+	def login_succes(self, req, response):
 		if self.manager.responseIsSuccess(response):
 			self.manager.api.token = response["data"]["oAuth"]
 			self.manager.app.config.set("credentials", "username", username)
@@ -87,7 +87,7 @@ class ProductView(Screen):
 		popup.open()
 		self.manager.go_back("ScannerView")
 
-	def search_succes(self, response):
+	def search_succes(self, req, response):
 		if self.manager.api.responseIsSuccess(response):		
 			barcode = self.manager.scanned
 			print "zoeken van product met barcode %s: %s" % (barcode, response["status"]["meaning"])
@@ -135,6 +135,18 @@ class ProductView(Screen):
 		self.add_product()
 
 	def add_product(self):
+		self.manager.api.add(self.id, self.amount, "S". self.add_success, self.add_failed)
+		
+
+	def add_success(self, req, response):
+		if self.manager.api.responseIsSuccess(response):
+			print "%s stuks toevoegen aan de winkelmand: %s" % (self.amount, response["status"]["meaning"])
+			self.manager.go_back("ScannerView")
+		else:
+			self.add_failed("Fout bij toevoegen: %s" % (response["status"]["meaning"]))
+
+
+	def add_failed(self, err)
 		response = self.manager.api.add(self.id, self.amount, "S")
 		print "%s stuks toevoegen aan de winkelmand: %s" % (self.amount, response["status"]["meaning"])
 		self.manager.go_back("ScannerView")
@@ -153,7 +165,7 @@ class ScannerView(Screen):
 		self.manager.scanner.terminate()
 		self.manager.api.logout(self.logout_success, self.logout_failed)
 
-	def logout_success(self, result):
+	def logout_success(self, req, result):
 		if self.manager.api.responseIsSuccess(result):
 			self.manager.app.config.set("credentials", "username", "")
 			self.manager.app.config.set("credentials", "password", "")
@@ -187,7 +199,7 @@ class IpView(Screen):
 		s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		return socket.inet_ntoa(fcntl.ioctl(
 			s.fileno(),
-			0x8915,  # SIOCGIFADDR
+			0x8915, # SIOCGIFADDR
 			struct.pack("256s", ifname[:15])
 		)[20:24])
 
@@ -196,7 +208,7 @@ class BasketView(Screen):
 		self.ids.articles.clear_widgets()
 		self.manager.api.show_basket(self.basket_success, self.basket_failed)
 
-	def basket_success(self, response):
+	def basket_success(self, req, response):
 		if self.manager.api.responseIsSuccess(response):
 			for category in response["data"]["articles"]:
 				#category["colruyt.cogomw.bo.RestTreeBranch"]["description"]

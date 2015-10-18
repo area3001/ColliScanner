@@ -24,13 +24,13 @@ class ColruytAPI:
 		if username is not None and password is not None:
 			self.login(username, password, self.login_success, self.login_failed)
 	
-	def login_success(self, response):
+	def login_success(self, req, response):
 		if self.responseIsSuccess(response):
 			self.token = response["data"]["oAuth"]
 		else:
 			self.login_failed("Login failed: %s" % (response["status"]["meaning"]))
 
-	def login_failed(self, err):
+	def login_failed(self, req, err):
 		raise ValueError(err)
 
 	def loggedIn(self):
