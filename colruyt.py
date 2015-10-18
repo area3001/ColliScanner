@@ -1,6 +1,5 @@
 import httplib2 as http
 import json
-import os
 
 try:
 	from urlparse import urlparse
@@ -84,11 +83,7 @@ class ColruytAPI:
 		body = "oAuth=%s" % (self.token)
 		return self.request(path, body)
 
-	def get_product_image(self, path, productId):
-		filename = "img/product_%s.jpg" % (productId)
-		if os.path.isfile(filename):
-			return filename
-
+	def get_product_image(self, path):
 		path = path.replace("200x200", "500x500")
 		uri = "https://colruyt.collectandgo.be/cogo"
 		headers = {
@@ -106,8 +101,5 @@ class ColruytAPI:
 				"GET",
 				headers=headers)
 		if response.status == 200:
-			
-			with open(filename, 'wb') as f:
-				f.write(content)
-			return filename
+			return content
 		return None
