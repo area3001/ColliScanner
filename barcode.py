@@ -20,6 +20,8 @@ class BarcodeScanner(Thread):
 
 	def run(self):
 		self.quit = False
+		if self.camera.closed:
+			self.camera.open()
 		self.scan()
 
 	def terminate(self):
