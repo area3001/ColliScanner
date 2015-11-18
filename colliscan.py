@@ -186,12 +186,10 @@ class ScannerView(Screen):
 		popup.open()	
 
 	def scan_callback(self, barcode):
-		for symbol in image:
-			# barcodes found
-			print "decoded %s" % (barcode)
-			self.manager.scanned = barcode
-			self.manager.go_next("ProductView")
-			self.manager.scanner.terminate()
+		print "decoded %s" % (barcode)
+		self.manager.scanned = barcode
+		self.manager.go_next("ProductView")
+		self.manager.scanner.terminate()
 
 	def setCallback(self):
 		self.manager.scanner = BarcodeScanner()
